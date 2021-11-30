@@ -1,0 +1,131 @@
+---
+swagger: "2.0"
+info:
+  description: "microservice that handles notifications for MMIB"
+  version: "1.0.0"
+  title: "Notifications"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /notification:
+    post:
+      summary: "create a notification"
+      operationId: "create_notification"
+      parameters:
+      - in: "body"
+        name: "notification"
+        description: "the notification to create"
+        required: true
+        schema:
+          $ref: "#/definitions/Notification"
+      responses:
+        "201":
+          description: "the notification id"
+          schema:
+            type: "integer"
+        "400":
+          description: "invalid input"
+      x-swagger-router-controller: "notifications.controllers.default_controller"
+  /notification/{message}:
+    delete:
+      summary: "delete a notification for a retreated message"
+      operationId: "delete_notification"
+      parameters:
+      - name: "message"
+        in: "path"
+        description: "the message id for the notification to delete"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "success"
+        "404":
+          description: "not found"
+      x-swagger-router-controller: "notifications.controllers.default_controller"
+  /notifications/{user}:
+    get:
+      summary: "retrieve all (unread) user notifications"
+      operationId: "get_notifications"
+      parameters:
+      - name: "user"
+        in: "path"
+        description: "user's email"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Notification"
+      x-swagger-router-controller: "notifications.controllers.default_controller"
+    put:
+      summary: "set all user notifications as read"
+      operationId: "set_notifications_as_read"
+      parameters:
+      - name: "user"
+        in: "path"
+        description: "user's email"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "success"
+      x-swagger-router-controller: "notifications.controllers.default_controller"
+  /notifications/count/{user}:
+    get:
+      summary: "return the number of unread user notifications"
+      operationId: "notifications_count"
+      parameters:
+      - name: "user"
+        in: "path"
+        description: "user's email"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "the number of unread user notifications"
+          schema:
+            type: "integer"
+      x-swagger-router-controller: "notifications.controllers.default_controller"
+definitions:
+  Notification:
+    type: "object"
+    required:
+    - "description"
+    - "timestamp"
+    - "title"
+    - "user_email"
+    properties:
+      id:
+        type: "integer"
+      user_email:
+        type: "string"
+      title:
+        type: "string"
+      description:
+        type: "string"
+      timestamp:
+        type: "string"
+      status:
+        type: "integer"
+      message_id:
+        type: "integer"
+      is_read:
+        type: "boolean"
+      is_deleted:
+        type: "boolean"
+    description: "an object representing a notification"
+    example:
+      is_read: true
+      user_email: "user_email"
+      is_deleted: true
+      description: "description"
+      message_id: 1
+      id: 0
+      title: "title"
+      timestamp: "timestamp"
+      status: 6

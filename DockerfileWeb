@@ -1,0 +1,20 @@
+FROM python:3-alpine
+
+WORKDIR /code
+ADD . /code
+
+ENV DOCKER=yes
+ENV TZ=Europe/Rome
+
+COPY requirements.txt /code
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY . /code
+
+EXPOSE 8080
+
+ENTRYPOINT ["python3"]
+
+CMD ["-m", "notifications"]
+
