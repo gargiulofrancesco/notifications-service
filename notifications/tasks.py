@@ -47,7 +47,7 @@ def send_unsent_past_due(app):
             Notification.timestamp <= datetime.now().strftime('%Y-%m-%dT%H:%M'))
         )
         for row in query:
-            deliver_notification(app, row.get_id())
+            deliver_notification(row.get_id())
 
 
 
