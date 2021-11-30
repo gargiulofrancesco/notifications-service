@@ -3,8 +3,14 @@ from notifications.database import Notification
 from notifications.database import db
 from datetime import datetime
 from sqlalchemy import and_
+import os
 
-BACKEND = BROKER = 'redis://redis:6379/0'
+
+if os.environ.get('DOCKER') is not None:
+    BACKEND = BROKER = 'redis://redis:6379/0'
+else:
+    BACKEND = BROKER = 'redis://localhost:6379/0'
+
 celery = Celery(__name__, backend=BACKEND, broker=BROKER)
 _APP = None
 

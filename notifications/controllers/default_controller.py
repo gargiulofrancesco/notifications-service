@@ -71,12 +71,12 @@ def delete_notification(message):  # noqa: E501
     """
     query = db.session.query(DBNotification).filter(DBNotification.message_id==message)
     if query.count()==0:
-        return 404
+        return "Not Found", 404
     
     else:
         query.update(dict(is_deleted=True))
         db.session.commit()
-        return 200
+        return "", 200
 
 
 def get_notifications(user):  # noqa: E501
@@ -121,7 +121,7 @@ def set_notifications_as_read(user):  # noqa: E501
     """
     db.session.query(DBNotification).filter_by(user_email=user,status=2).update(dict(is_read=True))
     db.session.commit()
-    return 200
+    return "", 200
 
 
 

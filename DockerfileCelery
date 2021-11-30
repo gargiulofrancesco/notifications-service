@@ -7,4 +7,4 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apk add build-base
 RUN apk add git
 RUN pip install -r requirements.txt
-CMD ["celery", "-A", "notifications.tasks.celery", "worker", "-l", "INFO"]
+CMD ["celery", "-A", "notifications.tasks.celery", "worker", "--loglevel=DEBUG"]

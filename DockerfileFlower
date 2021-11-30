@@ -8,4 +8,4 @@ RUN apk add build-base
 RUN apk add git
 RUN pip install -r requirements.txt
 RUN pip install flower
-CMD ["celery", "-A", "notifications.tasks.celery", "flower", "--port=5555", "--broker=redis://redis:6379/0"]
+CMD ["celery", "-A", "notifications.tasks.celery", "worker", "-l", "INFO"]
