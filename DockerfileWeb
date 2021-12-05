@@ -12,7 +12,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY . /code
 
-EXPOSE 5000
+EXPOSE 5004
 
 ENTRYPOINT ["python3"]
 
