@@ -1,9 +1,11 @@
 from celery import Celery
+from celery.schedules import crontab
 from notifications.database import Notification
 from notifications.database import db
 from datetime import datetime
 from sqlalchemy import and_
-import os
+import requests
+import os, sys
 
 
 if os.environ.get('DOCKER') is not None:
@@ -13,7 +15,7 @@ else:
 
 celery = Celery(__name__, backend=BACKEND, broker=BROKER)
 _APP = None
-
+LOTTERY_PRIZE = 100
 
 def do_task():
     global _APP
@@ -33,6 +35,13 @@ def setup_periodic_tasks(sender, **kwargs):
         300.0,
         send_unsent_past_due.s(_APP),
         name='crash recovery'
+    )
+    # Runs the lottery every lottery period
+    sender.add_periodic_task(
+        #crontab(hour=16, minute=41, day_of_month=8),
+        30,
+        lottery_task.s(_APP),
+        name='lottery task'
     )
 
 
@@ -56,8 +65,6 @@ def send_unsent_past_due(app):
             deliver_notification(row.get_id())
 
 
-
-
 @celery.task
 def deliver_notification(notification_id):
     do_task()
@@ -66,3 +73,43 @@ def deliver_notification(notification_id):
         db.session.commit()
 
     return 0
+
+
+@celery.task
+def lottery_task(app):
+    """
+    Runs the lottery
+    :param app: the flask.current_app object, can be None
+    """
+    do_task()
+    # noinspection PyUnresolvedReferences
+    with _APP.app_context():
+        try:
+            url = "http://users_ms_worker:5001/lottery" 
+            response = requests.get(url)
+            winner_id = response.json()
+            url = "http://users_ms_worker:5001/users/by_id/"+str(winner_id)
+            response = requests.get(url)
+
+            winner_email = response.json()['email']
+            print("WINNER: "+winner_email, file=sys.stderr)
+            title = "Lottery Win"
+            description = "Congratulations! You won " + str(LOTTERY_PRIZE) +" points"
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            message_id = -1
+
+            new_notification = Notification()
+            new_notification.add_notification(
+                winner_email,
+                title,
+                description,
+                timestamp,
+                False,
+                False,
+                2,
+                message_id
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+        except Exception:
+            return
