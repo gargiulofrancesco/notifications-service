@@ -9,7 +9,7 @@ import os
 
 
 if os.environ.get('DOCKER') is not None:
-    BACKEND = BROKER = 'redis://redis:6379/0'
+    BACKEND = BROKER = 'redis://redis:6379/0' # pragma: no cover
 else:
     BACKEND = BROKER = 'redis://localhost:6379/0'
 
@@ -91,21 +91,19 @@ def lottery_task(app):
             response = requests.get(url)
 
             winner_email = response.json()['email']
-            title = "Lottery Win"
             description = "Congratulations! You won " + str(LOTTERY_PRIZE) +" points"
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            message_id = -1
 
             new_notification = Notification()
             new_notification.add_notification(
                 winner_email,
-                title,
+                "Lottery Win",
                 description,
                 timestamp,
                 False,
                 False,
                 2,
-                message_id
+                -1
             )
             db.session.add(new_notification)
             db.session.commit()

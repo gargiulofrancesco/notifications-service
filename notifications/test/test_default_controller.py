@@ -7,8 +7,9 @@ from six import BytesIO
 
 from notifications.models.notification import Notification  # noqa: E501
 from notifications.test import BaseTestCase
-from notifications.test.utils import create_notification, get_notifications_by_message_id
-
+from notifications.test.utils import create_notification, get_notifications_by_message_id, get_notification_by_id
+from notifications.tasks import deliver_notification
+import sys
 
 
 
@@ -34,6 +35,14 @@ class TestDefaultController(BaseTestCase):
             content_type='application/json')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
+
+        deliver_notification(1)
+        query = get_notification_by_id(1).first()
+        assert query.status == 2
+
+        
+
+
 
 
     def test_delete_notification(self):

@@ -20,3 +20,6 @@ def get_notifications_by_message_id(message_id):
     notifications = db.session.query(DBNotification).filter(DBNotification.message_id==message_id)
     return notifications
 
+def get_notification_by_id(id):
+    notification = db.session.query(DBNotification).filter(DBNotification.id==id)
+    return notification
