@@ -5,7 +5,7 @@ from notifications.database import db
 from datetime import datetime
 from sqlalchemy import and_
 import requests
-import os, sys
+import os
 
 
 if os.environ.get('DOCKER') is not None:
@@ -38,8 +38,7 @@ def setup_periodic_tasks(sender, **kwargs):
     )
     # Runs the lottery every lottery period
     sender.add_periodic_task(
-        #crontab(hour=16, minute=41, day_of_month=8),
-        30,
+        crontab(hour=16, minute=41, day_of_month=8),
         lottery_task.s(_APP),
         name='lottery task'
     )
@@ -92,7 +91,6 @@ def lottery_task(app):
             response = requests.get(url)
 
             winner_email = response.json()['email']
-            print("WINNER: "+winner_email, file=sys.stderr)
             title = "Lottery Win"
             description = "Congratulations! You won " + str(LOTTERY_PRIZE) +" points"
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
