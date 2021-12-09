@@ -1,0 +1,6 @@
+[run]
+omit =
+    notifications/__main__.py
+    notifications/models/*
+    notifications/util.py
+    notifications/encoder.py
