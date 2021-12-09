@@ -89,7 +89,7 @@ def get_notifications(user):  # noqa: E501
 
     :rtype: List[Notification]
     """
-    query_notifications = db.session.query(DBNotification).filter_by(user_email=user,is_read=False, is_deleted=False,status=2)
+    query_notifications = db.session.query(DBNotification).filter_by(user_email=user,is_read=False, is_deleted=False,status=2).order_by(DBNotification.timestamp.desc())
     notifications = [_dbnotifications2notifications(r) for r in query_notifications]
     return jsonify(notifications), 200
 
